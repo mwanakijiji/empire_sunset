@@ -25,6 +25,7 @@ hdr.write('technical_string;scotland;;\n')
 hdr.write('display_string;Scotland;;\n')
 hdr.write('start_date;1707 May 1;Treaty of Union;Wikipedia\n')
 hdr.write('end_date;-99999;;\n')
+hdr.write('other;;;\n')
 
 hdr.write('##############################\n')
 

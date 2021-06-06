@@ -13,7 +13,7 @@ import numpy as np
 
 # Read processed csv back in
 
-df_processed = pd.read_csv(processed_file_name,skiprows=6)
+df_processed = pd.read_csv(processed_file_name,skiprows=7)
 print("Reading in " + processed_file_name)
 
 

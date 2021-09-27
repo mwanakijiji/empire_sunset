@@ -9,9 +9,11 @@ import ephem
 import skyfield
 import pandas as pd
 import numpy as np
+import ipdb
 
 # read in raw file as written out by ArcGIS
 df = pd.read_csv("./data/test.csv")
+ipdb.set_trace()
 
 scotland_df = df.where(np.logical_and(df["Join_Count"] == 1,df["NAME_1"] == "Scotland")).dropna(how="all")
 

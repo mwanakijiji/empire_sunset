@@ -10,18 +10,20 @@ import skyfield
 import pandas as pd
 import numpy as np
 import xarray as xr
+from skyfield import api
+from skyfield.api import Loader
+from skyfield import almanac
 
 # Read processed csv back in
 processed_file_name = "test_processed_anguilla.csv"
 df_processed = pd.read_csv(processed_file_name,skiprows=6)
 print("Reading in " + processed_file_name)
 
+# fix a strange conda/pandas conflict; see https://github.com/pandas-profiling/pandas-profiling/issues/662
+pd.set_option("display.max_columns", None)
+
 
 # Ref: https://rhodesmill.org/skyfield/almanac.html
-
-from skyfield import api
-from skyfield.api import Loader
-from skyfield import almanac
 
 load = Loader('~/skyfield-data')
 ts = api.load.timescale()
@@ -29,65 +31,83 @@ ts = api.load.timescale()
 # load JPL ephemeri
 # de440.bsp: 31-DEC-1549 00:00 to   25-JAN-2650 00:00
 # de441.bsp goes to 17191 AD
-eph = api.load('de440.bsp') # change so that it doesn't have to be downloaded each time
+eph = api.load('de440.bsp')
 
-# extract start and end dates
+# set start and end dates
 t0 = ts.utc(1707, 5, 1, 4)
-t1 = ts.utc(1707, 6, 2, 4)
+t1 = ts.utc(1707, 5, 10, 4)
 
-# for each coordinate, calculate sunrise and sunset times for the relevant range of dates
-for ind_num in range(0,len(df_processed)):
+## ## TDB dates for now; IS THAT WHAT I WANT? NOTE THAT TDB USED AGAIN LATER
+## ## WHEN POPULATING THE DATAFRAME
 
-    #print(df_processed["LAT"][ind_num])
-    #print(df_processed["LON"][ind_num])
+jd_range = np.arange(np.floor(t0.tdb),np.floor(t1.tdb), dtype=int) # range of TDB Julian dates
 
-    bluffton = api.wgs84.latlon(df_processed["LAT"][ind_num], df_processed["LON"][ind_num])
 
-    f = almanac.risings_and_settings(eph, eph['Sun'], bluffton)
-    t, y = almanac.find_discrete(t0, t1, f)
 
-    for ti, yi in zip(t, y):
-        print(ti.utc_iso(), 'Rise' if yi else 'Set')
-import ipdb; ipdb.set_trace()
+# make new DataFrame where each stored element is the fraction to add to the JD column
+# to denote the time of that event (rise or set)
 
-# print the UT day only (i.e., '1707-05-10T22:33:54Z' -> '1707-05-10')
-# t.utc_strftime(format="%Y-%m-%d")
-# insert safety catch that first two elements are the same (i.e., 1 rise and 1 set)
+# columns:
+# [0]: LAT
+# [1]: LON
+# [2]: JD
+# [3]: Event ('1=rise' or '0=set')
 
-# generate an axis of strings denoting UT date and event (1: rise, 0: set)
-# ex.: 1707-05-01_1 means 'UT 1707-05-01, rise'
-epoch_axis = ([str(a) + "_" +str(b) for a,b in zip(days_array,y)])
 lat_axis = df_processed["LAT"].values
 lon_axis = df_processed["LON"].values
 
-# construct a 3d xarray with axes epoch, LAT, LON
-# later: add in attrs as meta-data
-data = xr.DataArray(data=np.zeros((len(epoch_axis),len(lat_axis),len(lon_axis))),
-                    dims=("time", "LAT", "LON"),
-                    coords={"time": epoch_axis, "LAT": np.arange(len(df_processed["LAT"])), "LON":np.arange(len(df_processed["LON"]))})
-
-chron_len = len(data["time"])
-lat_len = len(data["LAT"])
-lon_len = len(data["LON"])
-lat_test_val = 46
-lon_test_val = 33
-# loop over each chronological slice
-## ## THIS INELEGANT FOR-LOOP WORKS AS-IS
-for t_i in range(0,chron_len):
-    time_string = data["time"][t_i]
-    # loop over latitude
-    for lat_i in range(0,lat_len):
-        lat_string = data["LAT"][lat_i]
-        # loop over longitude
-        for lon_i in range(0,lon_len):
-            lon_string = data["LON"][lon_i]
-            # insert test value 314
-            cond_mask = data.where((data["time"] == time_string) & (data["LAT"] == lat_test_val) & (data["LON"] == lon_test_val))
-            data[cond_mask] = 314
+latlon_base = df_processed[["LAT","LON"]].copy()
+#data["JD"] = jd_range_repeat
 
 
-# print the data to file
-# columns:
-# [0]: UT date
-# [1]: Event ('rise' or 'set')
-# [2]: UT time
+# tile JD values (for sunrise and sunset); there should be a pair of identical (LAT, LON)
+# for each JD value
+jd_range_repeat = np.repeat(jd_range, 2*len(lat_axis))
+
+# events: 1=rise (I THINK), 0=set
+event_boolean_base = np.concatenate((np.ones(len(lat_axis)),np.zeros(len(lat_axis))))
+event_boolean = np.tile(event_boolean_base, len(jd_range)).astype(int)
+
+# make a DataFrame starting with a tiling of the LAT, LON values
+data = pd.DataFrame(np.tile(latlon_base,(2*len(jd_range),1)), columns=["LAT","LON"])
+
+# insert JDs and placeholders for fractions
+data["JD_FLOOR"] = jd_range_repeat
+data["JD_MOD"] = np.nan # for JD modulus
+data["EVENT"] = event_boolean
+
+
+# for each coordinate, calculate sunrise and sunset times for the relevant range of dates
+for ind_num in range(0,len(data)):
+
+    print(ind_num)
+
+    bluffton = api.wgs84.latlon(data["LAT"][ind_num], data["LON"][ind_num])
+
+    f = almanac.risings_and_settings(eph, eph['Sun'], bluffton)
+    epochs_full, riseorset = almanac.find_discrete(t0, t1, f)
+
+    # loop over each event and populate the JD_MOD column with the decimal
+    # part of the JD
+    for t in range(0,len(epochs_full)):
+
+        #print(riseorset[t])
+        #import ipdb; ipdb.set_trace()
+
+        #epoch_this = epochs_full[t]
+        #riseorset_this = riseorset[t]
+
+        data.loc[((data["JD_FLOOR"] == np.floor(epochs_full.tdb[t].astype(float))) &
+                (data["LAT"] == data["LAT"][ind_num]) &
+                (data["LON"] == data["LON"][ind_num]) &
+                (data["EVENT"] == int(riseorset[t]))), "JD_MOD"] = epochs_full.tdb[t]%1
+        #cond_mask = data.where((data["JD_FLOOR"] == np.floor(epochs_full.tdb[t].astype(float))) & (data["LAT"] == data["LAT"][ind_num]) & (data["LON"] == data["LON"][ind_num]) & (data["EVENT"] == riseorset[t]))
+        #import ipdb; ipdb.set_trace()
+        #data["JD_MOD"][cond_mask] = epochs_full.tdb[t]%1 # get fractional day
+
+# make new column that sums the JD whole numbers and fractions
+data["JD_FULL"] = data["JD_FLOOR"] + data["JD_MOD"]
+
+
+
+import ipdb; ipdb.set_trace()

@@ -3,6 +3,7 @@ technical_string;brit_antarctica;;
 display_string;British Antarctic Territory;;
 start_date;1962 March 3;Statutory Instrument - the British Antarctic Territory Order in Council 1962/400;britishantarcticterritory.org.uk
 end_date;-99999;;
+polygon_spacing;2500;km^2;
 other;;;
 ##############################
 LAT,LON
@@ -427,4 +428,3 @@ LAT,LON
 -69.02781980708995,-70.18094505757537
 -69.02781980708995,-66.58768392109728
 -69.02781980708995,-66.13852627903752
--69.02781980708995,-65.68936863697776

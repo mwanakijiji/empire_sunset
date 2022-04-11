@@ -1,0 +1,20 @@
+DATE|EVENT|OCCASION|SOURCES
+1845 July 11|British concession in Shanghai delimited|Kong Mujiu and George Balfour concluded Shanghai Land Regulations|Johnstone Am. Pol. Sci. Rev. 1937 Oct. 31(5):942-947,F. Zhou PhD Thesis 2010 Georgia Tech
+1859|Canton concession granted||Johnstone Am. Pol. Sci. Rev. 1937 Oct. 31(5):942-948
+1860|Tianjin concession granted||Johnstone Am. Pol. Sci. Rev. 1937 Oct. 31(5):942-948
+1861|Hankow concession granted||Johnstone Am. Pol. Sci. Rev. 1937 Oct. 31(5):942-948
+1861|Kiukiang concession granted|Treaty of Land Lease in Jiujiang|Johnstone Am. Pol. Sci. Rev. 1937 Oct. 31(5):942-948
+1861|Chinkiang concession granted||Johnstone Am. Pol. Sci. Rev. 1937 Oct. 31(5):942-948
+1863 September 21|Shanghai concession merged with American zone to form Shanghai Intl Settlement||Johnstone Am. Pol. Sci. Rev. 1937 Oct. 31(5):942-948, Nield Chinas Foreign Places p. 201
+1895 July 1|East Africa Protectorate was proclaimed|bought from BEA Company|THR Cashmere PhD Thesis 1965 Cambridge
+1896|Hankow concession extended||Johnstone Am. Pol. Sci. Rev. 1937 Oct. 31(5):942-948
+1897|Tianjin concession extension||Johnstone Am. Pol. Sci. Rev. 1937 Oct. 31(5):942-948
+1899 May 11|Shanghai concession extension|Arrangements btwn parties concluded|General Index to the Published Volumes of the Diplomatic Correspondence and Foreign Relations of the United States. 1861-1899
+1900-02|Tianjin concession addl grant||Johnstone Am. Pol. Sci. Rev. 1937 Oct. 31(5):942-948
+1918|Tianjin grants consolidated||Johnstone Am. Pol. Sci. Rev. 1937 Oct. 31(5):942-948
+1927|Hankow concession returned to China||Johnstone Am. Pol. Sci. Rev. 1937 Oct. 31(5):942-948
+1927|Kiukiang concession returned to China||Johnstone Am. Pol. Sci. Rev. 1937 Oct. 31(5):942-948
+1929 November 15|Chinkiang concession returned to China||NYT 1929 Nov. 12| Johnstone, Am. Pol. Sci. Rev. 1937 Oct. 31(5):942-948
+1941 December 8|Shanghai International Zone effectivel ends|Japanese occupation|
+1943 May 20|Tianjin concession returned to China|Sino-British Treaty for the Relinquishment of Extra-Territorial Rights in China|treaty text,Liu+ J Arch. Plann. 2019 Dec. 83(754(:2465-2474
+1943 May 20|Canton concession returned to China|Sino-British Treaty for the Relinquishment of Extra-Territorial Rights in China|treaty text
